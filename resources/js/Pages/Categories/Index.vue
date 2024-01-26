@@ -8,14 +8,14 @@ export default {
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import { Inertia } from "@inertiajs/inertia";
+import { computed } from 'vue';
 
-defineProps({
+const props=defineProps({
   categories: {
     type: Object,
     required: true,
   },
 });
-
 /*const handleAction = (event, id) => {
   const selectedAction = event.target.value;
   if (selectedAction === "edit") {
@@ -32,6 +32,17 @@ const deleteCategory = (id) => {
     Inertia.delete(route("categories.destroy", id));
   }
 };
+
+const decodedLinks = computed(() => {
+  return props.categories.links.map(link => {
+    const parser = new DOMParser();
+    const decodedString = parser.parseFromString(`<!doctype html><body>${link.label}`, 'text/html').body.textContent;
+    return {
+      ...link,
+      label: decodedString
+    };
+  });
+});
 </script>
 
 <template>
@@ -57,8 +68,8 @@ const deleteCategory = (id) => {
           <ul role="list" class="divide-y divide-gray-100">
             <li
               class="flex items-center justify-between gap-x-6 py-5"
-              v-for="category in categories.data"
-              :key="category.id"
+              v-for="(category,index) in categories.data"
+              :key="index"
             >
               <div class="flex items-center gap-x-4">
                 <img
@@ -94,12 +105,46 @@ const deleteCategory = (id) => {
                     <button
                       class="inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
                       @click="deleteCategory(category.id)"
-                      >Delete</button>
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
             </li>
           </ul>
+        </div>
+        <div class="flex justify-between mt-4">
+          <nav aria-label="Page navigation">
+            <ul class="flex list-style-none">
+              <li
+                v-for="link in decodedLinks"
+                :key="link.label"
+                class="ml-1 first:ml-0"
+              >
+                <Link
+                  v-if="link.url"
+                  :href="link.url"
+                  :class="[
+                    'px-3 py-1 rounded-md',
+                    link.active
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white text-blue-500 border border-blue-500',
+                  ]"
+                 
+                >{{ link.label }}</Link>
+                <span
+                  v-else
+                  :class="[
+                    'px-3 py-1 rounded-md',
+                    link.active
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white text-gray-500 cursor-default',
+                  ]"
+                >{{ link.label }}</span>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>

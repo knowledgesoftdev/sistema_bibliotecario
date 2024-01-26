@@ -9,6 +9,7 @@ use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
+    const NUMBER_ITEMS_PAGE=5;
     /**
      * Display a listing of the resource.
      *
@@ -16,8 +17,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        define("NUMBER_ITEMS_PAGE",3);
-        $categories=Category::paginate(NUMBER_ITEMS_PAGE);
+       
+        $categories=Category::paginate(self::NUMBER_ITEMS_PAGE);
         return inertia('Categories/Index',['categories'=>$categories]);
     }
 

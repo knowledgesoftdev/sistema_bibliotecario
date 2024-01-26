@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LocationRequest;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
 class LocationController extends Controller
 {
+
+    const CURRENT_PAGE_INDEX=5;
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +18,7 @@ class LocationController extends Controller
      */
     public function index()
     {
-        $locations=Location::paginate(15);
+        $locations=Location::paginate(self::CURRENT_PAGE_INDEX);
         return inertia('Locations/Index',['locations'=>$locations]);
     }
     /**
@@ -25,7 +28,7 @@ class LocationController extends Controller
      */
     public function create()
     {
-        //
+        return inertia("Locations/Create");
     }
 
     /**
@@ -34,9 +37,10 @@ class LocationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(LocationRequest $request)
     {
-        //
+        $location=Location::create($request->validated());
+        return  redirect()->route("locations.index");
     }
 
     /**
@@ -56,9 +60,10 @@ class LocationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($slug)
     {
-        //
+        $location = Location::where("slug", $slug)->firstOrFail();
+        return inertia("Locations/Edit", ['location' => $location]);
     }
 
     /**
@@ -68,9 +73,10 @@ class LocationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(LocationRequest $request, Location $location)
     {
-        //
+        $location->update($request->validated());
+        return redirect()->route('locations.index');
     }
 
     /**
